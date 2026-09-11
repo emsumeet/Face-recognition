@@ -380,6 +380,6 @@ GitHub: **emsumeet**
 
 ## Status
 
-🚧 **Active Development**
+**Active Development**
 
 The basic face-recognition pipeline is operational. Current development focuses on systematic evaluation, threshold calibration, and improving recognition reliability.
