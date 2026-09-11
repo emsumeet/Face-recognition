@@ -1,0 +1,75 @@
+import os
+import cv2
+import pickle
+from insightface.app import FaceAnalysis
+
+
+def main():
+    print("Loading face recognition model...")
+
+    app = FaceAnalysis(
+        name="buffalo_l",
+        providers=["CPUExecutionProvider"]
+    )
+
+    app.prepare(
+        ctx_id=0,
+        det_size=(640, 640)
+    )
+
+    faces_folder = "data/faces"
+    embeddings = []
+
+    print("Scanning face images...")
+
+    for person_name in os.listdir(faces_folder):
+        person_folder = os.path.join(faces_folder, person_name)
+
+        if not os.path.isdir(person_folder):
+            continue
+
+        print(f"Processing: {person_name}")
+
+        for filename in os.listdir(person_folder):
+            image_path = os.path.join(person_folder, filename)
+
+            image = cv2.imread(image_path)
+
+            if image is None:
+                print(f"Could not read: {image_path}")
+                continue
+
+            faces = app.get(image)
+
+            if len(faces) == 0:
+                print(f"No face found: {filename}")
+                continue
+
+            # Use the largest detected face
+            face = max(
+                faces,
+                key=lambda x: (x.bbox[2] - x.bbox[0]) *
+                              (x.bbox[3] - x.bbox[1])
+            )
+
+            embeddings.append({
+                "name": person_name,
+                "embedding": face.embedding
+            })
+
+            print(f"  ✓ {filename}")
+
+    os.makedirs("models", exist_ok=True)
+
+    output_file = "models/face_embeddings.pkl"
+
+    with open(output_file, "wb") as file:
+        pickle.dump(embeddings, file)
+
+    print()
+    print(f"Created {len(embeddings)} embeddings.")
+    print(f"Saved to: {output_file}")
+
+
+if __name__ == "__main__":
+    main()
