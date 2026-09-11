@@ -158,6 +158,9 @@ pip install -r requirements.txt
 
 ## Adding a Person
 
+> **Note:** Sample face images are not included in this repository for privacy reasons.  
+> Add your own sample photos inside the `data/faces/` directory before generating embeddings.
+
 Create a directory inside:
 
 ```text
